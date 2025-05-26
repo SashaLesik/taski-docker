@@ -164,14 +164,6 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
-        
-      # Создаем .env файл из секретов
-      - name: Create .env file
-        run: |
-          echo DATABASE_URL=${{ secrets.DATABASE_URL }} >> .env
-          echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
-        
-      # Копируем файл .env на сервер
       - name: Deploy .env file to server
         uses: appleboy/scp-action@master
         with:
@@ -181,9 +173,6 @@ jobs:
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           source: ".env"
           target: "/home/***/taski/.env"
-      # Очистка временного .env файла
-      - name: Clean up .env file
-        run: rm .env
       # Копируем docker-compose.production.yml на продакшен-сервер
       - name: Copy docker-compose.yml via ssh
         uses: appleboy/scp-action@master
