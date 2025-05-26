@@ -156,58 +156,58 @@ jobs:
           # Тут вместо username должен быть ваш логин на Docker Hub
           tags: sashalesik/taski_gateway:latest
   deploy:
-  runs-on: ubuntu-latest
-  needs: 
-    - build_and_push_to_docker_hub
-    - build_frontend_and_push_to_docker_hub
-    - build_gateway_and_push_to_docker_hub
-  steps:
-    - name: Checkout repo
-      uses: actions/checkout@v3
-      
-    # Создаем .env файл из секретов
-    - name: Create .env file
-      run: |
-        echo DATABASE_URL=${{ secrets.DATABASE_URL }} >> .env
-        echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
-      
-    # Копируем файл .env на сервер
-    - name: Deploy .env file to server
-      uses: appleboy/scp-action@master
-      with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USER }}
-        key: ${{ secrets.SSH_KEY }}
-        passphrase: ${{ secrets.SSH_PASSPHRASE }}
-        source: ".env"
-        target: "/home/***/taski/.env"
-    # Очистка временного .env файла
-    - name: Clean up .env file
-      run: rm .env
-    # Копируем docker-compose.production.yml на продакшен-сервер
-    - name: Copy docker-compose.yml via ssh
-      uses: appleboy/scp-action@master
-      with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USER }}
-        key: ${{ secrets.SSH_KEY }}
-        passphrase: ${{ secrets.SSH_PASSPHRASE }}
-        source: "docker-compose.production.yml"
-        target: "taski"
-      
-    # Выполняем команды для деплоя на сервере
-    - name: Executing remote ssh commands to deploy
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USER }}
-        key: ${{ secrets.SSH_KEY }}
-        passphrase: ${{ secrets.SSH_PASSPHRASE }}
-        script: |
-          cd taski
-          sudo docker compose -f docker-compose.production.yml pull
-          sudo docker compose -f docker-compose.production.yml down
-          sudo docker compose -f docker-compose.production.yml up -d
-          sudo docker compose -f docker-compose.production.yml exec backend python manage.py migrate
-          sudo docker compose -f docker-compose.production.yml exec backend python manage.py collectstatic
-          sudo docker compose -f docker-compose.production.yml exec backend cp -r /app/collected_static/. /backend_static/static/
+    runs-on: ubuntu-latest
+    needs: 
+      - build_and_push_to_docker_hub
+      - build_frontend_and_push_to_docker_hub
+      - build_gateway_and_push_to_docker_hub
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+        
+      # Создаем .env файл из секретов
+      - name: Create .env file
+        run: |
+          echo DATABASE_URL=${{ secrets.DATABASE_URL }} >> .env
+          echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
+        
+      # Копируем файл .env на сервер
+      - name: Deploy .env file to server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          source: ".env"
+          target: "/home/***/taski/.env"
+      # Очистка временного .env файла
+      - name: Clean up .env file
+        run: rm .env
+      # Копируем docker-compose.production.yml на продакшен-сервер
+      - name: Copy docker-compose.yml via ssh
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          source: "docker-compose.production.yml"
+          target: "taski"
+        
+      # Выполняем команды для деплоя на сервере
+      - name: Executing remote ssh commands to deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          script: |
+            cd taski
+            sudo docker compose -f docker-compose.production.yml pull
+            sudo docker compose -f docker-compose.production.yml down
+            sudo docker compose -f docker-compose.production.yml up -d
+            sudo docker compose -f docker-compose.production.yml exec backend python manage.py migrate
+            sudo docker compose -f docker-compose.production.yml exec backend python manage.py collectstatic
+            sudo docker compose -f docker-compose.production.yml exec backend cp -r /app/collected_static/. /backend_static/static/
