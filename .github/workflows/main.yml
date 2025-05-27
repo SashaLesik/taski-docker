@@ -170,8 +170,8 @@ jobs:
         username: ${{ secrets.USER }}
         key: ${{ secrets.SSH_KEY }}
         passphrase: ${{ secrets.SSH_PASSPHRASE }}
-        source: .env 
-        target: taski/.env
+        source: "taski-docker/.env"
+        target: "/home/***/taski/.env"
     - name: Checkout repo
       uses: actions/checkout@v3
     # Копируем docker-compose.production.yml на продакшен-сервер
