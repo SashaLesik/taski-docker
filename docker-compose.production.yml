@@ -1,7 +1,7 @@
 # docker-compose.production.yml
 volumes:
   pg_data_production:
-  static_volume:
+  static:
 
 # Всё отличие — заменяем build на image и указываем, какой образ использовать
 services:
@@ -14,19 +14,20 @@ services:
     image: sashalesik/taski_backend # Качаем с Docker Hub
     env_file: .env
     volumes:
-      - static_volume:/backend_static
+      - static:/backend_static
   frontend:
     image: sashalesik/taski_frontend  # Качаем с Docker Hub
     env_file: .env
     ports:
-      - "3000:8000" 
-    command: cp -r /app/build/. /frontend_static/
+      - "3000:8000"
     volumes:
-      - static_volume:/frontend_static
+      - static:/frontend_static
   gateway:
+    depends_on:
+      - backend
     image: sashalesik/taski_gateway  # Качаем с Docker Hub
     env_file: .env
     volumes:
-      - static_volume:/staticfiles/
+      - static:/staticfiles/
     ports:
       - 8000:80
