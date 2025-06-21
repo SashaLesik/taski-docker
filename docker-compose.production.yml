@@ -14,13 +14,12 @@ services:
     image: sashalesik/taski_backend # Качаем с Docker Hub
     env_file: .env
     volumes:
-      - static:/backend_static/
+      - static:/backend_static/static/
   frontend:
     image: sashalesik/taski_frontend  # Качаем с Docker Hub
     env_file: .env
     command: cp -r /app/build/. /frontend_static/
     volumes:
-      - static:/frontend_static
   gateway:
     depends_on:
       - backend
