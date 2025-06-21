@@ -14,13 +14,13 @@ services:
     image: sashalesik/taski_backend # Качаем с Docker Hub
     env_file: .env
     volumes:
-      - static:/backend_static/static/
+      - static:/backend_static/static
   frontend:
     image: sashalesik/taski_frontend  # Качаем с Docker Hub
     env_file: .env
-    command: cp -r /app/build/. /frontend_static/
+    command: cp -r /app/build/. /frontend_static/  # Копируем собранные файлы в папку, которую видит gateway
     volumes:
-      - static:/frontend_static/
+      - static:/frontend_static
 
   gateway:
     depends_on:
@@ -28,6 +28,6 @@ services:
     image: sashalesik/taski_gateway  # Качаем с Docker Hub
     env_file: .env
     volumes:
-      - static:/staticfiles/
+      - static:/staticfiles
     ports:
       - 8000:80
