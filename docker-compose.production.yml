@@ -20,6 +20,8 @@ services:
     env_file: .env
     command: cp -r /app/build/. /frontend_static/
     volumes:
+      - static:/frontend_static/
+
   gateway:
     depends_on:
       - backend
